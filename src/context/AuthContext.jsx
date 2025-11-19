@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { getToken, getUser, setToken, setUser, clearAuth } from '../utils/token';
 import { telegramLogin } from '../services/auth';
 import { getInitData } from '../utils/telegram';
+import { WebApp } from '@twa-dev/sdk';
 
 const AuthContext = createContext(null);
 
