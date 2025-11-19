@@ -40,13 +40,20 @@ function AppRoutes() {
     return <Loading message="Initializing..." />;
   }
 
+  // Show error even if loading is false but not authenticated
   if (error && !isAuthenticated) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-telegram-bg text-telegram-text">
         <div className="text-center max-w-md">
           <h1 className="text-xl font-bold mb-4 text-red-400">Authentication Error</h1>
           <p className="mb-4">{error}</p>
-          <p className="text-sm text-gray-400">Please try refreshing the app or contact support.</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 bg-telegram-button hover:bg-telegram-buttonHover text-white rounded mt-4 transition-colors"
+          >
+            Retry
+          </button>
+          <p className="text-sm text-gray-400 mt-4">If the problem persists, please contact support.</p>
         </div>
       </div>
     );

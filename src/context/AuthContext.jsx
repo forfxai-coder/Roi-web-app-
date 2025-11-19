@@ -28,14 +28,18 @@ export function AuthProvider({ children }) {
 
         // Try to login with Telegram initData
         const initData = getInitData();
-        if (initData) {
+        console.log('initData received:', initData ? 'Yes (length: ' + initData.length + ')' : 'No');
+        
+        // Check if initData exists and is not empty
+        if (initData && initData.trim().length > 0) {
+          console.log('Attempting login...');
           const result = await telegramLogin(initData);
+          console.log('Login successful:', result);
           setTokenState(result.token);
           setUserState(result.user);
         } else {
-          // Don't set error if we're not in Telegram - that's expected
-          // The UI will handle showing appropriate message
-          setError(null);
+          console.error('No valid initData available');
+          setError('Unable to get Telegram authentication data. Please try refreshing the app.');
         }
       } catch (err) {
         console.error('Auto-login failed:', err);

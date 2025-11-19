@@ -5,6 +5,7 @@ import { getToken, removeToken, clearAuth } from '../utils/token';
 // Create Axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 10000, // 10 second timeout to prevent hanging
   headers: {
     'Content-Type': 'application/json',
   },
