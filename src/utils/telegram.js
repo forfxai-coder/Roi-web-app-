@@ -47,11 +47,31 @@ export function getTelegramWebApp() {
 
 /**
  * Get initData from Telegram WebApp
+ * Tries multiple methods to get initData
  */
 export function getInitData() {
   try {
     if (isTelegramWebApp()) {
-      return WebApp.initData || null;
+      // Try @twa-dev/sdk WebApp.initData first
+      if (WebApp.initData && WebApp.initData.trim().length > 0) {
+        return WebApp.initData;
+      }
+      
+      // Fallback: Try window.Telegram.WebApp.initData (legacy API)
+      if (typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp) {
+        const legacyInitData = window.Telegram.WebApp.initData;
+        if (legacyInitData && legacyInitData.trim().length > 0) {
+          return legacyInitData;
+        }
+      }
+      
+      // Last resort: Try to get from initDataUnsafe and reconstruct
+      // This is less ideal but might work if initData string isn't available
+      if (WebApp.initDataUnsafe && WebApp.initDataUnsafe.query_id) {
+        console.warn('initData string not available, but initDataUnsafe found');
+        // We can't reconstruct the full initData string, but we can try
+        // For now, return null and let the error handler show a message
+      }
     }
   } catch (e) {
     console.warn('Error getting initData:', e);

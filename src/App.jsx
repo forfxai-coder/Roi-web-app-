@@ -115,7 +115,12 @@ function AppRoutes() {
 function App() {
   useEffect(() => {
     // Initialize Telegram WebApp (with error handling)
-    initTelegramWebApp();
+    // Wait a bit to ensure Telegram SDK is loaded
+    const timer = setTimeout(() => {
+      initTelegramWebApp();
+    }, 50);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   return (

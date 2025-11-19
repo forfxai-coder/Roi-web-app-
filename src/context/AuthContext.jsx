@@ -26,9 +26,27 @@ export function AuthProvider({ children }) {
           return;
         }
 
-        // Try to login with Telegram initData
-        const initData = getInitData();
+        // Wait a bit for Telegram WebApp to fully initialize
+        // Sometimes initData isn't available immediately
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // Try to get initData with retries
+        let initData = getInitData();
+        let retries = 3;
+        
+        while (!initData && retries > 0) {
+          console.log(`Waiting for initData... (${retries} retries left)`);
+          await new Promise(resolve => setTimeout(resolve, 200));
+          initData = getInitData();
+          retries--;
+        }
+
         console.log('initData received:', initData ? 'Yes (length: ' + initData.length + ')' : 'No');
+        console.log('WebApp object:', typeof WebApp !== 'undefined' ? 'Available' : 'Not available');
+        if (typeof WebApp !== 'undefined') {
+          console.log('WebApp.initData:', WebApp.initData ? 'Has data' : 'Empty');
+          console.log('WebApp.initDataUnsafe:', WebApp.initDataUnsafe ? 'Has data' : 'Empty');
+        }
         
         // Check if initData exists and is not empty
         if (initData && initData.trim().length > 0) {
@@ -38,8 +56,9 @@ export function AuthProvider({ children }) {
           setTokenState(result.token);
           setUserState(result.user);
         } else {
-          console.error('No valid initData available');
-          setError('Unable to get Telegram authentication data. Please try refreshing the app.');
+          console.error('No valid initData available after retries');
+          console.error('This might be a Telegram WebApp configuration issue.');
+          setError('Unable to get Telegram authentication data. Please make sure you opened this app from your Telegram bot.');
         }
       } catch (err) {
         console.error('Auto-login failed:', err);
