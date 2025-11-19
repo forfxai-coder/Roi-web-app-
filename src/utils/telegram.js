@@ -5,14 +5,30 @@ import { WebApp } from '@twa-dev/sdk';
  */
 export function isTelegramWebApp() {
   try {
-    // WebApp object exists in Telegram, check if platform is not 'unknown'
-    // In Telegram, platform will be 'ios', 'android', 'web', etc., never 'unknown'
-    if (typeof WebApp !== 'undefined' && WebApp) {
-      return WebApp.platform !== 'unknown';
+    // First check: window.Telegram.WebApp (from telegram.org/js/telegram-web-app.js script)
+    if (typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp) {
+      const tgWebApp = window.Telegram.WebApp;
+      // In Telegram, version will be set
+      if (tgWebApp.version) {
+        return true;
+      }
     }
-    // Fallback: check for window.Telegram (legacy Telegram WebApp API)
-    return typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp;
+    
+    // Second check: @twa-dev/sdk WebApp
+    if (typeof WebApp !== 'undefined' && WebApp) {
+      // Check if platform is set and not 'unknown'
+      if (WebApp.platform && WebApp.platform !== 'unknown') {
+        return true;
+      }
+      // Also check if version exists (indicates Telegram environment)
+      if (WebApp.version) {
+        return true;
+      }
+    }
+    
+    return false;
   } catch (e) {
+    console.error('Error checking Telegram WebApp:', e);
     return false;
   }
 }
@@ -22,10 +38,22 @@ export function isTelegramWebApp() {
  */
 export function initTelegramWebApp() {
   try {
-    if (isTelegramWebApp()) {
+    // Try window.Telegram.WebApp first (from script tag)
+    if (typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp) {
+      const tgWebApp = window.Telegram.WebApp;
+      tgWebApp.ready();
+      tgWebApp.expand();
+      tgWebApp.enableClosingConfirmation();
+      console.log('Initialized Telegram WebApp via window.Telegram.WebApp');
+      return tgWebApp;
+    }
+    
+    // Fallback to @twa-dev/sdk
+    if (isTelegramWebApp() && typeof WebApp !== 'undefined') {
       WebApp.ready();
       WebApp.expand();
       WebApp.enableClosingConfirmation();
+      console.log('Initialized Telegram WebApp via @twa-dev/sdk');
       return WebApp;
     }
   } catch (error) {
@@ -61,30 +89,40 @@ export function getInitData() {
       }
     }
 
-    if (isTelegramWebApp()) {
-      // Try @twa-dev/sdk WebApp.initData first
+    // Try window.Telegram.WebApp first (from script tag - most reliable)
+    if (typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp) {
+      const tgWebApp = window.Telegram.WebApp;
+      if (tgWebApp.initData && tgWebApp.initData.trim().length > 0) {
+        console.log('Found initData in window.Telegram.WebApp.initData');
+        return tgWebApp.initData;
+      }
+      console.log('window.Telegram.WebApp.initData:', tgWebApp.initData || 'empty');
+    }
+
+    // Try @twa-dev/sdk WebApp.initData
+    if (typeof WebApp !== 'undefined' && WebApp) {
       if (WebApp.initData && WebApp.initData.trim().length > 0) {
         console.log('Found initData in WebApp.initData');
         return WebApp.initData;
       }
-      
-      // Fallback: Try window.Telegram.WebApp.initData (legacy API)
-      if (typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp) {
-        const legacyInitData = window.Telegram.WebApp.initData;
-        if (legacyInitData && legacyInitData.trim().length > 0) {
-          console.log('Found initData in window.Telegram.WebApp.initData');
-          return legacyInitData;
-        }
-      }
-      
-      // Debug: Log what we have
-      console.log('WebApp.initData:', WebApp.initData);
-      console.log('WebApp.initDataUnsafe:', WebApp.initDataUnsafe);
-      if (typeof window !== 'undefined' && window.Telegram) {
-        console.log('window.Telegram.WebApp:', window.Telegram.WebApp);
-        console.log('window.Telegram.WebApp.initData:', window.Telegram.WebApp?.initData);
-      }
+      console.log('WebApp.initData:', WebApp.initData || 'empty');
     }
+    
+    // Debug: Log what we have
+    console.log('=== Debug Info ===');
+    console.log('window.Telegram exists:', typeof window !== 'undefined' && !!window.Telegram);
+    if (typeof window !== 'undefined' && window.Telegram) {
+      console.log('window.Telegram.WebApp:', window.Telegram.WebApp);
+      console.log('window.Telegram.WebApp.version:', window.Telegram.WebApp?.version);
+      console.log('window.Telegram.WebApp.platform:', window.Telegram.WebApp?.platform);
+      console.log('window.Telegram.WebApp.initData:', window.Telegram.WebApp?.initData || 'empty');
+    }
+    if (typeof WebApp !== 'undefined') {
+      console.log('WebApp.platform:', WebApp.platform);
+      console.log('WebApp.version:', WebApp.version);
+      console.log('WebApp.initDataUnsafe:', WebApp.initDataUnsafe);
+    }
+    console.log('==================');
   } catch (e) {
     console.warn('Error getting initData:', e);
   }

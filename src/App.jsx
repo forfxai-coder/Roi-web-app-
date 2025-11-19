@@ -52,10 +52,16 @@ function AppRoutes() {
           {/* Debug Info */}
           <div className="mt-4 p-3 bg-telegram-secondary rounded text-left text-xs">
             <p className="font-bold mb-2">Debug Info:</p>
-            <p>Platform: {typeof WebApp !== 'undefined' ? WebApp.platform : 'Unknown'}</p>
-            <p>initData: {typeof WebApp !== 'undefined' && WebApp.initData ? 'Available' : 'Not Available'}</p>
-            <p>initDataUnsafe: {typeof WebApp !== 'undefined' && WebApp.initDataUnsafe ? 'Available' : 'Not Available'}</p>
+            <p>window.Telegram: {typeof window !== 'undefined' && window.Telegram ? 'Exists' : 'Not Found'}</p>
+            <p>window.Telegram.WebApp: {typeof window !== 'undefined' && window.Telegram?.WebApp ? 'Exists' : 'Not Found'}</p>
+            <p>Platform: {typeof window !== 'undefined' && window.Telegram?.WebApp?.platform ? window.Telegram.WebApp.platform : (typeof WebApp !== 'undefined' ? WebApp.platform : 'Unknown')}</p>
+            <p>Version: {typeof window !== 'undefined' && window.Telegram?.WebApp?.version ? window.Telegram.WebApp.version : (typeof WebApp !== 'undefined' ? WebApp.version : 'Unknown')}</p>
+            <p>initData: {typeof window !== 'undefined' && window.Telegram?.WebApp?.initData ? 'Available' : (typeof WebApp !== 'undefined' && WebApp.initData ? 'Available' : 'Not Available')}</p>
+            <p>initDataUnsafe: {typeof window !== 'undefined' && window.Telegram?.WebApp?.initDataUnsafe ? 'Available' : (typeof WebApp !== 'undefined' && WebApp.initDataUnsafe ? 'Available' : 'Not Available')}</p>
             <p className="mt-2 text-gray-400">Check browser console for more details</p>
+            <p className="mt-2 text-yellow-400 text-xs">
+              ⚠️ If Platform is "Unknown", make sure you opened this from your bot's menu button in Telegram
+            </p>
           </div>
           
           <button 
