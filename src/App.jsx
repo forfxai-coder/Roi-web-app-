@@ -47,7 +47,7 @@ function AppRoutes() {
       <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-telegram-bg text-telegram-text">
         <div className="text-center max-w-md">
           <h1 className="text-xl font-bold mb-4 text-red-400">Authentication Error</h1>
-          <p className="mb-4">{error}</p>
+          <p className="mb-4 font-semibold">{error}</p>
           
           {/* Debug Info */}
           <div className="mt-4 p-3 bg-telegram-secondary rounded text-left text-xs">
@@ -62,6 +62,9 @@ function AppRoutes() {
             <p className="mt-2 text-yellow-400 text-xs">
               ⚠️ If Platform is "Unknown", make sure you opened this from your bot's menu button in Telegram
             </p>
+            <p className="mt-2 text-yellow-400 text-xs">
+              ⚠️ If error mentions CORS or Network, check Render backend CORS_ORIGIN setting
+            </p>
           </div>
           
           <button 
@@ -71,7 +74,7 @@ function AppRoutes() {
             Retry
           </button>
           <p className="text-sm text-gray-400 mt-4">
-            Make sure you opened this app from your Telegram bot's menu button.
+            If the error mentions "CORS" or "Network error", you need to add your Netlify URL to the backend CORS_ORIGIN in Render.
           </p>
         </div>
       </div>
