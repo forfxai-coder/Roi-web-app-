@@ -5,7 +5,13 @@ import { WebApp } from '@twa-dev/sdk';
  */
 export function isTelegramWebApp() {
   try {
-    return typeof WebApp !== 'undefined' && WebApp && WebApp.initData;
+    // WebApp object exists in Telegram, check if platform is not 'unknown'
+    // In Telegram, platform will be 'ios', 'android', 'web', etc., never 'unknown'
+    if (typeof WebApp !== 'undefined' && WebApp) {
+      return WebApp.platform !== 'unknown';
+    }
+    // Fallback: check for window.Telegram (legacy Telegram WebApp API)
+    return typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp;
   } catch (e) {
     return false;
   }
