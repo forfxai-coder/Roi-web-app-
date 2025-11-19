@@ -6,9 +6,13 @@ import { setToken, setUser } from '../utils/token';
  */
 export async function telegramLogin(initData) {
   try {
+    if (!initData) {
+      throw new Error('Telegram initData is required');
+    }
+
     const response = await api.post('/auth/telegram', { initData });
     
-    if (response.data.success) {
+    if (response.data.success && response.data.token && response.data.user) {
       // Store token and user data
       setToken(response.data.token);
       setUser(response.data.user);
@@ -20,9 +24,17 @@ export async function telegramLogin(initData) {
       };
     }
     
-    throw new Error('Authentication failed');
+    throw new Error(response.data.error || 'Authentication failed');
   } catch (error) {
-    throw error;
+    // Provide more specific error messages
+    if (error.response) {
+      const errorMsg = error.response.data?.error || error.message;
+      throw new Error(errorMsg);
+    } else if (error.request) {
+      throw new Error('Network error. Please check your connection.');
+    } else {
+      throw error;
+    }
   }
 }
 

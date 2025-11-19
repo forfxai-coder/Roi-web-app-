@@ -33,7 +33,9 @@ export function AuthProvider({ children }) {
           setTokenState(result.token);
           setUserState(result.user);
         } else {
-          setError('Telegram initData not available');
+          // Don't set error if we're not in Telegram - that's expected
+          // The UI will handle showing appropriate message
+          setError(null);
         }
       } catch (err) {
         console.error('Auto-login failed:', err);
