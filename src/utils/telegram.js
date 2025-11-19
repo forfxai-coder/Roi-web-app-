@@ -51,9 +51,20 @@ export function getTelegramWebApp() {
  */
 export function getInitData() {
   try {
+    // First, try to get from URL parameters (sometimes Telegram passes it there)
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlInitData = urlParams.get('tgWebAppData') || urlParams.get('initData');
+      if (urlInitData && urlInitData.trim().length > 0) {
+        console.log('Found initData in URL parameters');
+        return urlInitData;
+      }
+    }
+
     if (isTelegramWebApp()) {
       // Try @twa-dev/sdk WebApp.initData first
       if (WebApp.initData && WebApp.initData.trim().length > 0) {
+        console.log('Found initData in WebApp.initData');
         return WebApp.initData;
       }
       
@@ -61,16 +72,17 @@ export function getInitData() {
       if (typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp) {
         const legacyInitData = window.Telegram.WebApp.initData;
         if (legacyInitData && legacyInitData.trim().length > 0) {
+          console.log('Found initData in window.Telegram.WebApp.initData');
           return legacyInitData;
         }
       }
       
-      // Last resort: Try to get from initDataUnsafe and reconstruct
-      // This is less ideal but might work if initData string isn't available
-      if (WebApp.initDataUnsafe && WebApp.initDataUnsafe.query_id) {
-        console.warn('initData string not available, but initDataUnsafe found');
-        // We can't reconstruct the full initData string, but we can try
-        // For now, return null and let the error handler show a message
+      // Debug: Log what we have
+      console.log('WebApp.initData:', WebApp.initData);
+      console.log('WebApp.initDataUnsafe:', WebApp.initDataUnsafe);
+      if (typeof window !== 'undefined' && window.Telegram) {
+        console.log('window.Telegram.WebApp:', window.Telegram.WebApp);
+        console.log('window.Telegram.WebApp.initData:', window.Telegram.WebApp?.initData);
       }
     }
   } catch (e) {

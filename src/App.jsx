@@ -9,6 +9,7 @@ import Deposit from './pages/Deposit';
 import Withdraw from './pages/Withdraw';
 import Referrals from './pages/Referrals';
 import { useEffect } from 'react';
+import { WebApp } from '@twa-dev/sdk';
 
 // Fallback component for non-Telegram access
 function TelegramRequired() {
@@ -47,13 +48,25 @@ function AppRoutes() {
         <div className="text-center max-w-md">
           <h1 className="text-xl font-bold mb-4 text-red-400">Authentication Error</h1>
           <p className="mb-4">{error}</p>
+          
+          {/* Debug Info */}
+          <div className="mt-4 p-3 bg-telegram-secondary rounded text-left text-xs">
+            <p className="font-bold mb-2">Debug Info:</p>
+            <p>Platform: {typeof WebApp !== 'undefined' ? WebApp.platform : 'Unknown'}</p>
+            <p>initData: {typeof WebApp !== 'undefined' && WebApp.initData ? 'Available' : 'Not Available'}</p>
+            <p>initDataUnsafe: {typeof WebApp !== 'undefined' && WebApp.initDataUnsafe ? 'Available' : 'Not Available'}</p>
+            <p className="mt-2 text-gray-400">Check browser console for more details</p>
+          </div>
+          
           <button 
             onClick={() => window.location.reload()} 
             className="px-4 py-2 bg-telegram-button hover:bg-telegram-buttonHover text-white rounded mt-4 transition-colors"
           >
             Retry
           </button>
-          <p className="text-sm text-gray-400 mt-4">If the problem persists, please contact support.</p>
+          <p className="text-sm text-gray-400 mt-4">
+            Make sure you opened this app from your Telegram bot's menu button.
+          </p>
         </div>
       </div>
     );
